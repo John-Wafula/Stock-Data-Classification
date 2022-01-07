@@ -1,0 +1,193 @@
+---
+title: "TREES"
+author: '...'
+date: "12/15/2021"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r}
+data<-read.csv("C:/Users/Admin/Downloads/HiLoLGFmac.csv")
+head(data)
+```
+```{r}
+reduced_size_stock_risk_data_set<- data[sample(nrow(data), size = 200, replace = FALSE), ]
+reduced_size_stock_risk_data_set
+```
+
+This dataset is a subset of the stock risk data ,it contains 200 obsercvations and three columns the first column is a text variables with binary values-Hi or Lo,it indicates wether a particular stock is a high risk or a low risk,the second variable is a standardised form of the stock values ,the second column is also a standardised column of the same.
+
+## Tree Based Model
+To examine the data collection, we first utilize classification trees. Hilorisk is a continuous variable in these data, therefore we start by recoding it as a binary variable. The ifelse() method is used to generate the variable ifelse ()
+
+High, which is set to Yes if the Sales variable is greater than 8, and Low, which is set to No if the Sales variable is less than 8.
+
+Otherwise, it takes the value No.
+```{r}
+library(tree)
+library(ISLR)
+attach(reduced_size_stock_risk_data_set)
+High=ifelse(ï..HiLoRisk =="Hi",1,0)
+```
+we use the data.frame() function to merge High with the rest of
+the  data.
+
+```{r}
+reduced_size_stock_risk_data_set =data.frame(reduced_size_stock_risk_data_set ,High)
+```
+To forecast tree() High utilizing all variables except Sales, we now use the tree() function to fit a classification tree. The tree() function has a syntax that is very similar to the lm() method.
+```{r}
+ tree.data =tree(Lag1LogLGFran∼. ,reduced_size_stock_risk_data_set)
+```
+To forecast tree() High utilizing all variables except Sales, we now use the tree() function to fit a classification tree. The tree() function has a syntax that is very similar to the lm() method.
+```{r}
+summary(tree.data )
+```
+The tree structure is displayed using the plot() method, and the node labels are displayed using the text() function. Instead of merely displaying a letter for each category, the parameter pretty=0 instructs R to include the category names for any qualitative predictors.
+
+```{r}
+plot(tree.data )
+text(tree.data ,pretty =0)
+```
+## Gini Index
+
+A Gini coefficient of one (or 100 percent) denotes the greatest disparity in values (e.g. for a large number of people where only one person has all the income or consumption and all others have none, the Gini coefficient will be nearly one).The Gini coefficient gauges the disparity in frequency distribution values (for example, levels of income). A Gini coefficient of 0 denotes perfect equality, in which all values are equal (e.g. where everyone has the same income). 
+
+The Gini coefficient, often known as the Gini index or the Gini ratio, is a statistical dispersion measure used in economics to quantify income or wealth disparity within a country or social group. Corrado Gini, a statistician and sociologist, created the Gini coefficient.
+
+The Gini coefficient is defined as the ratio of the area between the line of equality and the Lorenz curve (marked A in the diagram) to the total area under the line of equality (marked A and B in the diagram), or G = A/(A + B). Due to the fact that A + B = 0.5, it is also equal to 2A and 1 2B. (since the axes scale from 0 to 1).
+
+The Lorenz curve, which depicts the proportion of total population income (y axis) earned cumulatively by the lowest x of the population, is generally used to calculate the Gini coefficient (see diagram). As a result, the 45-degree line indicates perfect economic equality
+
+## A3
+
+We must estimate the test error rather than merely estimating the training error in order to appropriately evaluate the performance of a classification tree on these data. We divide the observations into a training set and a test set, then use the training set to create the tree and test it on the test data. This can be accomplished with the predict() function. The type="class" option instructs R to return the actual class prediction in the case of a classification tree. Around 71.5 percent of the locations in the test data set are correctly predicted using this method.
+
+```{r} 
+set.seed(2)
+train=sample (1: nrow(data ), 200)
+data.test=data[-train ,]
+High.test=High[-train]
+```
+
+```{r}
+library(rpart)
+library(rpart.plot)
+c.pure <- rpart(Lag1LogLGFran∼. ,reduced_size_stock_risk_data_set, control=rpart.control(minsplit=2, cp=0))
+prp(c.pure)
+
+```
+```{r}
+tree.data
+
+```
+P.B
+
+## K-Nearest Neighbours
+
+We'll now use the knn() function, which is part of the knn package, to conduct KNN ()
+a library of classes This function works a little differently than the other modelfitting functions we've seen so far. Rather than a two-step procedure,technique in which we fit the model first, then use the model to make decisions.Using a single command, knn() generates forecasts. The job description
+Four inputs are required.
+The knn() function, which is part of the knn() class library, will now be used to conduct KNN. This function works a little differently than the other modelfitting functions we've seen so far. Rather than taking a two-step strategy in which we first fit the model and then utilize it to make decisions, we'll take a single-step approach.
+Using a single command, knn() generates forecasts. The job description
+Four inputs are required.
+
+```{r}
+names(Smarket)
+```
+
+## A random sample of 500 days
+
+We are going to create a sample of 500 from our stock risk dataset that we will use to create the models
+
+```{r}
+sample1<- Smarket[sample(nrow(Smarket), size = 500, replace = FALSE), ]
+```
+
+```{r}
+glm.fit=glm(Direction∼Lag1+Lag2+Lag3+Lag4+Lag5+Volume ,
+data=Smarket ,family=binomial )
+```
+
+```{r}
+ summary (glm.fit)
+```
+Lag1 has the smallest p-value in this case. Because this predictor has a negative coefficient, it means that if the market had a positive return yesterday, it is less likely to go up today. The p-value, on the other hand, is 0.15.
+Because the sample size is still somewhat vast, there is no clear evidence of a true link.
+Direction is sandwiched between Lag1 and Lag2.
+To get only the coefficients for this, we utilize the coef() method.
+model that is tailored We can also use the summary() function to get specific information.
+elements of the fitted model, such as the coefficient p-values
+
+```{r}
+coef(glm.fit)
+summary (glm.fit)$coef
+summary (glm.fit)$coef[,4]
+```
+
+## Naive Bayes
+
+The Stock risk sample dataset will now be subjected to naive bayes analysis. We used the lda() function from the MASS library to fit a naive bayes model in R. The lda() function's syntax is nearly identical to that of lm() and glm(), with the exception of the omission of the family option. Only observations before to 2005 were used to fit the model.
+```{r}
+library(MASS)
+lda.fit=lda(Direction∼Lag1+Lag2 ,data=Smarket ,subset=train)
+lda.fit
+```
+The second component, posterior, is a matrix in which the kth column carries the result.
+The likelihood that the matching observation belongs to the kth group is the posterior probability.
+a class derived from (4.10). Finally, the linear discriminants are stored in x.
+as previously described.The predict() function produces a three-element list. bayes.predictions about market movement are contained in the first element, class.
+
+## K-Nearest Neighbours
+
+The knn() function, which is part of the knn() class library, will now be used to conduct KNN. This function works a little differently than the other modelfitting functions we've seen so far. Rather than utilizing a two-step strategy of fitting the model first and then using the model to create predictions, knn() makes predictions with just one instruction. Four inputs are required for the function to work.
+To link the Lag1 and cbind() Lag2 variables into two matrices, one for the training set and the other for the test set, we use the cbind() method, which stands for column bind.
+
+```{r eval=FALSE, include=TRUE}
+attach(sample1)
+library(class)
+train.X=cbind(Lag1,Lag2)[train,]
+test.X=cbind(Lag1,Lag2)[!tr{r}ain ,]
+train.Direction =Direction 
+```
+
+The knn() function can now be used to forecast market activity for 2005 dates. Before using knn(), we need to establish a random seed because if several observations are tied as nearest neighbors, R will choose one at random.
+
+sever the ties As a result, a seed must be planted in order to assure that the results are repeatable.
+
+```{r eval=FALSE, include=TRUE}
+set.seed(1)
+knn.pred=knn(train.X,test.X,train.Direction ,k=1)
+table(knn.pred ,Direction .2005)
+```
+
+From the analysis above,i have observed that The learning mechanisms of the three models differ slightly, with Naive Bayes being a generative model and Logistic regression being a discriminative model. What exactly does this imply?
+Model of creation: The joint distribution of the feature X and the target Y is modelled by Naive Bayes, which then predicts the posterior probability given as P(y|x).
+Discriminative model: By learning the input to output mapping and minimizing the error, logistic regression directly predicts the posterior probability of P(y|x).
+All features are assumed to be conditionally independent by Nave Bayes. In the case of a vast feature space, the prediction may be poor if some of the features are in fact reliant on each other.
+Logistic regression divides feature space in a linear fashion, and it usually works well even when certain variables are associated.
+Naive Bayes is a quick eager learning classifier that outperforms K-NN. As a result, it might be utilized to make real-time predictions. The Naive Bayes classifier is commonly used in email spam screening. It generates probability for each class using a probabilistic estimate method. It utilizes a maximum likelihood hypothesis and assumes conditional independence between the features. The best thing about this classifier is that it improves with time. The type of spam words in email evolves with time in a spam filtering task. In a "bag of words" model, the classifier calculates probability estimates for newly emerging spam words and ensures that it works well. This property of the classifier is related to the algorithm's inherent generative rather than discriminative character.
+
+## Appendix
+
+Lab work
+
+```{r eval=FALSE, include=TRUE}
+library(tree)
+library(ISLR)
+attach(Carseats )
+High=ifelse(Sales <=8,"No","Yes ")
+Carseats =data.frame(Carseats ,High)
+tree.carseats =tree(High ∼.-Sales , Carseats )
+
+plot(tree.carseats,main="IBRAHIM KONE" )
+text(tree.carseats ,pretty =0)
+```
+
+
+
+
+
+
+
